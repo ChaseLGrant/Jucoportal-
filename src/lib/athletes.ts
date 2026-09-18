@@ -154,14 +154,14 @@ export async function searchAthletes(params: SearchParams): Promise<SearchResult
   if (params.gpaMin) where.gpa = { gte: params.gpaMin };
   if (params.heightMin) where.heightInches = { gte: params.heightMin };
   if (params.weightMin) where.weightLbs = { gte: params.weightMin };
-  if (params.handedness) where.handedness = { contains: params.handedness };
-  if (params.major) where.major = { contains: params.major };
-  if (params.position) where.positions = { contains: params.position };
+  if (params.handedness) where.handedness = { contains: params.handedness, mode: "insensitive" };
+  if (params.major) where.major = { contains: params.major, mode: "insensitive" };
+  if (params.position) where.positions = { contains: params.position, mode: "insensitive" };
   if (params.q) {
     where.OR = [
-      { firstName: { contains: params.q } },
-      { lastName: { contains: params.q } },
-      { schoolName: { contains: params.q } },
+      { firstName: { contains: params.q, mode: "insensitive" } },
+      { lastName: { contains: params.q, mode: "insensitive" } },
+      { schoolName: { contains: params.q, mode: "insensitive" } },
     ];
   }
 

@@ -32,19 +32,29 @@ about two minutes. No friction. No paywalls. No social-network features.
 
 - **Next.js 15** (App Router) + **TypeScript**
 - **Tailwind CSS** — athletic, minimal, premium design system
-- **Prisma ORM** + **SQLite** — zero-config so it runs instantly; schema is written to be **Postgres/Supabase-compatible**
+- **Prisma ORM** + **PostgreSQL** (Supabase / Neon / Vercel Postgres, or local Postgres)
 - **jose** JWT session (httpOnly cookie) + **bcrypt** — role-based (Admin / Coach / Athlete)
 - **SheetJS (xlsx)** + **PapaParse** — in-browser roster parsing (CSV/XLSX)
 
-## 🚀 Run it
+## 🚀 Run it locally
+
+You need a PostgreSQL database. Easiest: create a free **Supabase** project and copy its
+connection string (see [DEPLOY.md](DEPLOY.md) Step 1).
 
 ```bash
+cp .env.example .env      # then paste your DATABASE_URL + set AUTH_SECRET / SEED_SECRET
 npm install
-npm run db:reset      # creates the SQLite DB and seeds 439 demo athletes
-npm run dev           # http://localhost:3000
+npm run db:deploy         # creates the tables (runs migrations)
+npm run db:seed           # loads 439 demo athletes
+npm run dev               # http://localhost:3000
 ```
 
-`npm run db:reset` = `prisma db push` + seed. Use `npm run db:seed` to re-seed without dropping.
+`npm run db:reset` drops everything and re-migrates + re-seeds. `npm run db:studio` opens a DB browser.
+
+## 🌐 Deploy it live
+
+See **[DEPLOY.md](DEPLOY.md)** — a click-by-click guide to publishing on **Vercel + Supabase** (both free).
+After deploying, load demo data once by visiting `/api/seed?token=YOUR_SEED_SECRET`.
 
 ### Demo logins (password: `password123`)
 
@@ -70,14 +80,10 @@ single source of truth that drives forms, athlete cards, search facets, and seed
 sport or performance field by appending to that file** (also mirrored into the `SportField` table
 for admin visibility) — no rebuild of the app required.
 
-## 🐘 Moving to Supabase / Postgres later
+## 🖼 Athlete photos
 
-1. In `prisma/schema.prisma`, change `datasource db { provider = "postgresql" }`.
-2. Set `DATABASE_URL` to your Supabase connection string.
-3. `npx prisma migrate dev` (the string-based "enums" promote cleanly to native Postgres enums).
-4. Object storage for athlete photos: swap the profile-image URL field for a Supabase Storage upload.
-
-The schema, entities and API boundaries were designed so this is a drop-in change.
+Photos currently use a pasted image-URL field. To accept real uploads, wire the profile-image
+field to **Supabase Storage** (create a public bucket, upload client-side, store the returned URL).
 
 ## 📁 Structure
 

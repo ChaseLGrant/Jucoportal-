@@ -1,13 +1,13 @@
-// The JUCO Portal — data model
-// Written to be Postgres-compatible: to migrate to Supabase/Postgres,
-// switch `provider` to "postgresql" and point DATABASE_URL at your instance.
+// The JUCO Portal — data model (PostgreSQL / Supabase).
+// Point DATABASE_URL at your Postgres instance (Supabase, Neon, Vercel Postgres,
+// or a local Postgres). See DEPLOY.md for the full deployment walkthrough.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
