@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-chalk-50 text-ink-900;
+  }
+  ::selection {
+    @apply bg-accent/20;
+  }
+}
+
+@layer components {
+  .container-wide {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+  .container-narrow {
+    @apply mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg font-semibold tracking-tight transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-lg { @apply h-12 px-6 text-[15px]; }
+  .btn-md { @apply h-10 px-4 text-sm; }
+  .btn-sm { @apply h-8 px-3 text-[13px]; }
+
+  .btn-primary {
+    @apply btn bg-accent text-white shadow-sm hover:bg-accent-hover active:scale-[0.98];
+  }
+  .btn-dark {
+    @apply btn bg-ink-900 text-white hover:bg-ink-800 active:scale-[0.98];
+  }
+  .btn-outline {
+    @apply btn border border-chalk-300 bg-white text-ink-900 hover:border-chalk-400 hover:bg-chalk-50;
+  }
+  .btn-ghost {
+    @apply btn text-ink-700 hover:bg-chalk-100;
+  }
+
+  .input {
+    @apply h-11 w-full rounded-lg border border-chalk-300 bg-white px-3.5 text-sm text-ink-900 placeholder:text-chalk-400 transition-colors focus:border-ink-900 focus:outline-none focus:ring-1 focus:ring-ink-900;
+  }
+  .select {
+    @apply input appearance-none bg-no-repeat pr-9;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+  }
+  .label {
+    @apply mb-1.5 block text-[11px] font-bold uppercase tracking-[0.08em] text-chalk-500;
+  }
+  .card {
+    @apply rounded-2xl border border-chalk-200 bg-white shadow-card;
+  }
+  .eyebrow {
+    @apply text-[11px] font-bold uppercase tracking-[0.14em] text-accent;
+  }
+  .stat-num {
+    @apply font-display text-2xl font-extrabold tracking-tight text-ink-900;
+  }
+}
+
+/* thin scrollbar for filter panels */
+.scroll-thin::-webkit-scrollbar { width: 8px; }
+.scroll-thin::-webkit-scrollbar-thumb { @apply rounded-full bg-chalk-300; }

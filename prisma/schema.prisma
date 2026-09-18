@@ -1,0 +1,202 @@
+// The JUCO Portal — data model
+// Written to be Postgres-compatible: to migrate to Supabase/Postgres,
+// switch `provider` to "postgresql" and point DATABASE_URL at your instance.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// Auth / users
+// Note: enums are represented as String for SQLite portability. Allowed values
+// are centralized in src/lib/constants.ts. (Postgres/Supabase can promote these
+// to native enums later.)
+// ----------------------------------------------------------------------------
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("ATHLETE") // ADMIN | COACH | ATHLETE
+  createdAt    DateTime @default(now())
+
+  coach          Coach?
+  claimedAthletes Athlete[] @relation("AthleteClaim")
+}
+
+// ----------------------------------------------------------------------------
+// Catalog: sports + flexible sport-specific fields
+// ----------------------------------------------------------------------------
+model Sport {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  name      String
+  gender    String  // "men" | "women" | "coed"
+  active    Boolean @default(true)
+  order     Int     @default(0)
+
+  fields   SportField[]
+  athletes Athlete[]
+}
+
+model SportField {
+  id      String  @id @default(cuid())
+  sportId String
+  sport   Sport   @relation(fields: [sportId], references: [id], onDelete: Cascade)
+
+  key     String  // machine key stored inside Athlete.metrics JSON
+  label   String
+  group   String  // "athletic" | "performance"
+  type    String  // "number" | "text" | "select"
+  unit    String?
+  options String? // JSON array for select types
+  order   Int     @default(0)
+
+  @@unique([sportId, key])
+}
+
+// ----------------------------------------------------------------------------
+// Schools + coaches
+// ----------------------------------------------------------------------------
+model School {
+  id         String  @id @default(cuid())
+  slug       String  @unique
+  name       String
+  city       String?
+  state      String?
+  conference String?
+  division   String  @default("JUCO")
+
+  coaches  Coach[]
+  athletes Athlete[]
+}
+
+model Coach {
+  id       String  @id @default(cuid())
+  userId   String  @unique
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schoolId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+
+  name     String
+  title    String?
+  email    String
+  phone    String?
+  verified Boolean @default(false)
+
+  uploads RosterUpload[]
+}
+
+// ----------------------------------------------------------------------------
+// Athletes
+// ----------------------------------------------------------------------------
+model Athlete {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  firstName String
+  lastName  String
+
+  sportId String
+  sport   Sport  @relation(fields: [sportId], references: [id])
+
+  schoolId String?
+  school   School? @relation(fields: [schoolId], references: [id])
+  // denormalized school name for uploads where a school row isn't matched
+  schoolName String?
+
+  // universal athletic fields (real columns for fast filtering)
+  positions        String?  // comma-separated
+  classYear        String?  // "Freshman" | "Sophomore"
+  transferYear     Int?     // e.g. 2027
+  transferSemester String?  // "Fall" | "Spring"
+  transferStatus   String @default("ACTIVELY_SEEKING") // ACTIVELY_SEEKING | OPEN | RETURNING | COMMITTED
+  eligibilityYears Int?     // years remaining
+  heightInches     Int?
+  weightLbs        Int?
+  handedness       String?  // e.g. "R/R", "L", "Right"
+  city             String?
+  state            String?
+
+  // academics
+  gpa                Float?
+  major              String?
+  creditsCompleted   Int?
+  expectedGraduation String?
+  academicInterests  String?
+
+  // sport-specific metrics stored flexibly as JSON keyed by SportField.key
+  metrics String @default("{}")
+
+  // media
+  photoUrl  String?
+  filmLinks String @default("[]") // JSON array of URLs
+  bio       String?
+
+  // contact + privacy
+  playerEmail String?
+  playerPhone String?
+  showEmail   Boolean @default(false)
+  showPhone   Boolean @default(false)
+
+  coachName  String?
+  coachTitle String?
+  coachEmail String?
+  coachPhone String?
+
+  // verification + lifecycle
+  verification String @default("SUBMITTED") // SUBMITTED | COACH_VERIFIED | PORTAL_VERIFIED
+  published    Boolean @default(true)
+  approved     Boolean @default(true)
+  views        Int     @default(0)
+
+  claimedById String?
+  claimedBy   User?   @relation("AthleteClaim", fields: [claimedById], references: [id])
+
+  uploadId String?
+  upload   RosterUpload? @relation(fields: [uploadId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reports Report[]
+
+  @@index([sportId])
+  @@index([transferStatus])
+  @@index([state])
+}
+
+// ----------------------------------------------------------------------------
+// Roster uploads
+// ----------------------------------------------------------------------------
+model RosterUpload {
+  id        String   @id @default(cuid())
+  coachId   String
+  coach     Coach    @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  filename  String
+  status    String   @default("mapped") // parsed | mapped | published
+  rowsTotal Int      @default(0)
+  rowsReady Int      @default(0)
+  rowsError Int      @default(0)
+  mapping   String   @default("{}") // JSON column->field mapping
+  createdAt DateTime @default(now())
+
+  athletes Athlete[]
+}
+
+// ----------------------------------------------------------------------------
+// Reports (report incorrect information)
+// ----------------------------------------------------------------------------
+model Report {
+  id        String   @id @default(cuid())
+  athleteId String
+  athlete   Athlete  @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  reason    String
+  details   String?
+  status    String   @default("open") // open | resolved
+  createdAt DateTime @default(now())
+}
