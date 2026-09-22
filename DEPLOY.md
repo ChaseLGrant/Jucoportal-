@@ -40,9 +40,8 @@ You'll need three more values besides the database URL:
 
 1. Go to **https://vercel.com** → **Sign up** with GitHub.
 2. Click **Add New… → Project**, then **Import** the repository **`ChaseLGrant/Jucoportal-`**.
-3. Vercel auto-detects Next.js — don't change the build settings.
-4. **Set the production branch:** after import, go to **Settings → Git → Production Branch** and set it to `claude/intelligent-babbage-wleqw9` (that's where your code is). *(Or ask Claude to move the code to `main`.)*
-5. Open **Settings → Environment Variables** and add these four (Environment: **Production**):
+3. Vercel auto-detects Next.js — don't change the build settings. It will deploy the **`main`** branch by default (that's your production code).
+4. Open **Settings → Environment Variables** and add these four (Environment: **Production**):
 
    | Name | Value |
    |---|---|
@@ -51,8 +50,8 @@ You'll need three more values besides the database URL:
    | `SEED_SECRET` | your other random string |
    | `NEXT_PUBLIC_SITE_URL` | `https://your-app.vercel.app` (update after first deploy) |
 
-6. Click **Deploy**. The build automatically creates all database tables (it runs `prisma migrate deploy`). Wait for "Congratulations".
-7. Copy your live URL (e.g. `https://juco-portal-xyz.vercel.app`). Go back to **Environment Variables**, update `NEXT_PUBLIC_SITE_URL` to that URL, and **redeploy** (Deployments → ⋯ → Redeploy).
+5. Click **Deploy**. The build automatically creates all database tables (it runs `prisma migrate deploy`). Wait for "Congratulations".
+6. Copy your live URL (e.g. `https://juco-portal-xyz.vercel.app`). Go back to **Environment Variables**, update `NEXT_PUBLIC_SITE_URL` to that URL, and **redeploy** (Deployments → ⋯ → Redeploy).
 
 ---
 
