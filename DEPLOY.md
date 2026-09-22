@@ -40,7 +40,7 @@ You'll need three more values besides the database URL:
 
 1. Go to **https://vercel.com** → **Sign up** with GitHub.
 2. Click **Add New… → Project**, then **Import** the repository **`ChaseLGrant/Jucoportal-`**.
-3. Vercel auto-detects Next.js — don't change the build settings. It will deploy the **`main`** branch by default (that's your production code).
+3. Vercel auto-detects Next.js — don't change the build settings. Your production code is on the **`main`** branch. If Vercel's **Production Branch** (Settings → Git) shows anything else, set it to `main`. *(Tip: on GitHub, Settings → Branches → set the default branch to `main` so it's picked automatically everywhere.)*
 4. Open **Settings → Environment Variables** and add these four (Environment: **Production**):
 
    | Name | Value |
